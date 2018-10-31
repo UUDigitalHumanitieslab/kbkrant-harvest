@@ -45,7 +45,7 @@ $ kill -CONT `cat harvest.pid`
 
 you can alternate between the SIGCONT and the SIGTSTP signals in order to harvest in start-stop cycles.
 
-In order to stop harvesting completely before it is done, send SIGINT, which is `kill`'s default signal:
+In order to stop harvesting completely before it is done, send SIGTERM, which is `kill`'s default signal:
 
 ```console
 $ kill `cat harvest.pid`
