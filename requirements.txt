@@ -4,9 +4,9 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-lxml==4.2.5               # via oaiharvest, pyoai
+-e git+https://github.com/infrae/pyoai.git#egg=pyoai
+lxml==4.2.5               # via oaiharvest
 mock==2.0.0               # via oaiharvest
 oaiharvest==3.0.0
 pbr==5.1.0                # via mock
-pyoai==2.5.0              # via oaiharvest
-six==1.11.0               # via mock, oaiharvest, pyoai
+six==1.11.0               # via mock, oaiharvest

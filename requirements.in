@@ -1,1 +1,2 @@
 oaiharvest
+-e git+https://github.com/infrae/pyoai.git#egg=pyoai

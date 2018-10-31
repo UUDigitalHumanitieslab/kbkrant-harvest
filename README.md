@@ -24,4 +24,4 @@ In theory, this should harvest a limited number of DDD records:
 $ oai-harvest -s DDD -l $LIMIT kb
 ```
 
-In practice, it doesn't work because of https://github.com/infrae/pyoai/pull/30. Next step is likely to fork `pyoai` in order to fix the issue ourselves.
+This does work, but it will start from scratch if you run the command again. In other words, you can't use this for incremental harvesting.
