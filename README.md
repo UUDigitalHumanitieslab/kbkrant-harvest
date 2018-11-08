@@ -10,43 +10,32 @@ Create and activate a virtualenv, then
 ```console
 $ pip install pip-tools
 $ pip-sync
-$ oai-reg add -p didl kb http://services.kb.nl/mdo/oai
+$ python -m oaiharvest.registry add -p didl kb http://services.kb.nl/mdo/oai/KEY
     # enter destination directory in the prompt (not inside this directory)
 ```
 
-
-## A single harvesting step
-
-In theory, this should harvest a limited number of DDD records:
-
-```console
-# $LIMIT should be an integer of choice (sets the number of records)
-$ oai-harvest -s DDD -l $LIMIT kb
-```
-
-This does work, but it will start from scratch if you run the command again. In other words, you can't use this for incremental harvesting. Read on for a possible solution.
+where `KEY` should be a valid API key.
 
 
-## Harvesting incrementally
+## Harvesting the metadata
 
-You can start a full harvest in the background and suspend it immediately, storing the process ID in a file, like this:
+This will harvest the entire set in one go:
 
 ```console
-$ oai-harvest -s DDD kb &
-$ echo $! >harvest.pid
-$ kill -TSTP `cat harvest.pid`
+$ python -m oaiharvest.harvest -s DDD kb
 ```
 
-To resume harvesting later, send the SIGCONT signal:
+To restrict harvesting to the night, add the `--between` argument, like this:
 
 ```console
-$ kill -CONT `cat harvest.pid`
+$ python -m oaiharvest.harvest -s DDD -b 19:00 06:00 kb
 ```
 
-you can alternate between the SIGCONT and the SIGTSTP signals in order to harvest in start-stop cycles.
+Run this in a `screen` session so you can logout from the harvesting server without interrupting the process.
 
-In order to stop harvesting completely before it is done, send SIGTERM, which is `kill`'s default signal:
 
-```console
-$ kill `cat harvest.pid`
-```
+## Preventing filesystem problems
+
+Run the `organize.py` over the harvesting directory every 15 minutes using a cron job. You need to have a crontab entry that looks like this:
+
+    14,29,44,59 0-5,19-23 * * * /absolute/path/to/virtualenv/bin/python /absolute/path/to/organize.py /absolute/path/to/harvesting/dir
