@@ -1,2 +1,3 @@
-oaiharvest
+-e git+https://github.com/UUDigitalHumanitieslab/oai-harvest.git@feature/incremental#egg=oaiharvest
 -e git+https://github.com/infrae/pyoai.git#egg=pyoai
+lxml
