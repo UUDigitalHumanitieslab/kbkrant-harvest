@@ -36,6 +36,6 @@ Run this in a `screen` session so you can logout from the harvesting server with
 
 ## Preventing filesystem problems
 
-Run the `organize.py` over the harvesting directory every 15 minutes using a cron job. You need to have a crontab entry that looks like this:
+Run the `organize.py` over the harvesting directory at least every 15 minutes using a cron job. You need to have a crontab entry that looks like this:
 
     14,29,44,59 0-5,19-23 * * * /absolute/path/to/virtualenv/bin/python /absolute/path/to/organize.py /absolute/path/to/harvesting/dir
