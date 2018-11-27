@@ -8,7 +8,7 @@ import tarfile
 from lxml import etree
 import requests
 
-from organize import MANIFEST_DIR
+from common import MANIFEST_DIR, TARBALL_FORMAT
 
 PROGRESS_DIR = 'in_progress'
 FINISHED_DIR = 'ocr_complete'
@@ -62,7 +62,7 @@ def process_manifest(manifest):
         subdir, newspaper = op.split(path)
         harvested = process_newspaper(subdir, newspaper)
         serial = newspaper.split(':')[2]
-        tarball_path = op.join(subdir, 'DDD_{}.tgz'.format(serial))
+        tarball_path = op.join(subdir, TARBALL_FORMAT.format(serial))
         with tarfile.open(tarball_path, 'w:gz') as tarball:
             tarball.add(path, arcname=newspaper)
             for fullpath, article in harvested:
