@@ -1,6 +1,7 @@
 import os
 import os.path as op
 import sys
+import time
 import traceback
 import gzip
 import tarfile
@@ -15,6 +16,7 @@ FINISHED_DIR = 'ocr_complete'
 OCR_XPATH = "//didl:Resource[../didl:Descriptor/didl:Statement/text()='ocr']"
 ERROR_LOG = 'failures.log'
 TIMEOUT = 1 # second
+RETRY_INTERVAL = 0.25 # second
 MAX_RETRIES = 5
 
 
@@ -93,6 +95,8 @@ def fetch_ocr(resource, ns, subdir, error_log):
     """ Try hard to get the article OCR. Return path on success, else None. """
     target_fname = 'undetermined'
     for retry_count in range(MAX_RETRIES):
+        if retry_count > 0:
+            time.sleep(RETRY_INTERVAL)
         try:
             target_fname = resource.xpath('@dcx:filename', namespaces=ns)[0]
             url = resource.get('ref')
