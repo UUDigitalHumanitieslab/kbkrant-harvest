@@ -5,6 +5,7 @@ import time
 import traceback
 import gzip
 import tarfile
+from hashlib import md5
 
 from lxml import etree
 import requests
@@ -99,9 +100,14 @@ def fetch_ocr(resource, ns, subdir, error_log):
             time.sleep(RETRY_INTERVAL)
         try:
             target_fname = resource.xpath('@dcx:filename', namespaces=ns)[0]
+            checksum = resource.xpath('@dcx:md5_checksum', namespaces=ns)[0]
             url = resource.get('ref')
             response = requests.get(url, timeout=TIMEOUT)
             response.raise_for_status()
+            if checksum:
+                hasher = md5()
+                hasher.update(response.content)
+                assert hasher.hexdigest() == checksum
             target_path = op.join(subdir, target_fname)
             with open(target_path, 'wb') as outfile:
                 outfile.write(response.content)
