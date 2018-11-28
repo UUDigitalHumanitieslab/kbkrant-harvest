@@ -84,15 +84,14 @@ def process_newspaper(subdir, newspaper):
     ns.pop(None, None) # duplicate of xmlns:didl (default namespace)
     resources = xml.xpath(OCR_XPATH, namespaces=ns)
     harvest = []
-    with open(op.join(subdir, ERROR_LOG), 'a', buffering=1) as error_log:
-        for node in resources:
-            result = fetch_ocr(node, ns, subdir, error_log)
-            if result is not None:
-                harvest.append(result)
+    for node in resources:
+        result = fetch_ocr(node, ns, subdir)
+        if result is not None:
+            harvest.append(result)
     return harvest
 
 
-def fetch_ocr(resource, ns, subdir, error_log):
+def fetch_ocr(resource, ns, subdir):
     """ Try hard to get the article OCR. Return path on success, else None. """
     target_fname = 'undetermined'
     for retry_count in range(MAX_RETRIES):
@@ -114,9 +113,10 @@ def fetch_ocr(resource, ns, subdir, error_log):
             return target_path, target_fname
         except:
             trace = traceback.format_exc()
-    print(target_fname, file=error_log)
-    print(trace, file=error_log)
-    print(file=error_log)
+    with open(op.join(subdir, ERROR_LOG), 'a') as error_log:
+        print(target_fname, file=error_log)
+        print(trace, file=error_log)
+        print(file=error_log)
 
 
 if __name__ == '__main__':
