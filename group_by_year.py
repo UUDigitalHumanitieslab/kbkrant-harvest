@@ -46,7 +46,9 @@ def reorganize_directory(dir, filenames, root):
     """ Expand and order all newspapers in `dir` by date. """
     for name in filenames:
         match = tarball_parser.parse(name)
-        if match:  # this is a newspaper tarball
+        symlink_name, ext = op.splitext(name)
+        if match and not op.exists(op.join(dir, symlink_name)):
+            # this is a newspaper tarball which wasn't reorganized yet
             (paper_id,) = match.fixed
             reorganize_newspaper(dir, name, paper_id, root)
 
@@ -57,6 +59,7 @@ def reorganize_newspaper(dir, tarball_name, paper_id, root):
     paper_name, _ = op.splitext(tarball_name)
     progress = op.join(root, PROGRESS_DIR, paper_name)
     metadata_path = op.join(progress, METADATA_FORMAT.format(paper_id))
+    symlink_path = op.join(dir, paper_name)
     try:
         os.mkdir(progress)
         with tarfile.open(tarball_path) as tarball:
@@ -69,15 +72,13 @@ def reorganize_newspaper(dir, tarball_name, paper_id, root):
         year, date = DATE_PATTERN.match(date_string).groups()
         target_dir = op.join(root, year, date)
         os.makedirs(target_dir, exist_ok=True)
-        os.rename(progress, op.join(target_dir, paper_name))
+        final_dir = op.join(target_dir, paper_name)
+        os.rename(progress, final_dir)
+        os.symlink(final_dir, symlink_path, target_is_directory=True)
     except:
         # Do nothing else, we rather have two copies than zero.
         logging.exception('Error when trying to reorganize %s', paper_name)
         sys.exit(1)
-    else:
-        # Also stop for now, let's just first check that this works for a single
-        # newspaper.
-        sys.exit(0)
 
 
 if __name__ == '__main__':
