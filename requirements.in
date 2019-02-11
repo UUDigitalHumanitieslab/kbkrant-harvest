@@ -2,3 +2,4 @@
 -e git+https://github.com/UUDigitalHumanitieslab/pyoai.git#egg=pyoai
 lxml
 requests
+parse

@@ -11,6 +11,7 @@ chardet==3.0.4            # via requests
 idna==2.7                 # via requests
 lxml==4.2.5
 mock==2.0.0
+parse==1.11.1
 pbr==5.1.0                # via mock
 requests==2.20.1
 six==1.11.0               # via mock
