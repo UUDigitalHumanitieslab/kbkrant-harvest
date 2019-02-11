@@ -10,9 +10,8 @@ from hashlib import md5
 from lxml import etree
 import requests
 
-from common import MANIFEST_DIR, TARBALL_FORMAT
+from common import MANIFEST_DIR, TARBALL_FORMAT, PROGRESS_DIR
 
-PROGRESS_DIR = 'in_progress'
 FINISHED_DIR = 'ocr_complete'
 OCR_XPATH = "//didl:Resource[../didl:Descriptor/didl:Statement/text()='ocr']"
 ERROR_LOG = 'failures.log'
