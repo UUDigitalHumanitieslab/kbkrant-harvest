@@ -48,7 +48,7 @@ def reorganize_directory(dir, filenames, root):
         match = tarball_parser.parse(name)
         if match:  # this is a newspaper tarball
             (paper_id,) = match.fixed
-            reorganize_newspaper(path, name, paper_id, root)
+            reorganize_newspaper(dir, name, paper_id, root)
 
 
 def reorganize_newspaper(dir, tarball_name, paper_id, root):
@@ -65,7 +65,7 @@ def reorganize_newspaper(dir, tarball_name, paper_id, root):
             xml = etree.parse(metadata)
         ns = xml.getroot().nsmap.copy()
         ns.pop(None, None) # duplicate of xmlns:didl (default namespace)
-        date_string = xml.xpath(DATE_XPATH, namespaces=ns)
+        date_string = xml.xpath(DATE_XPATH, namespaces=ns)[0]
         year, date = DATE_PATTERN.match(date_string).groups()
         target_dir = op.join(root, year, date)
         os.makedirs(target_dir, exist_ok=True)
