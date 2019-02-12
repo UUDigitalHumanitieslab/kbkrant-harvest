@@ -98,17 +98,8 @@ def fetch_ocr(resource, ns, subdir):
             time.sleep(RETRY_INTERVAL)
         try:
             target_fname = resource.xpath('@dcx:filename', namespaces=ns)[0]
-            checksum = resource.xpath('@dcx:md5_checksum', namespaces=ns)[0]
-            url = resource.get('ref')
-            response = requests.get(url, timeout=TIMEOUT)
-            response.raise_for_status()
-            if checksum:
-                hasher = md5()
-                hasher.update(response.content)
-                assert hasher.hexdigest() == checksum
             target_path = op.join(subdir, target_fname)
-            with open(target_path, 'wb') as outfile:
-                outfile.write(response.content)
+            attempt_download(resource, ns, target_path)
             return target_path, target_fname
         except:
             trace = traceback.format_exc()
@@ -116,6 +107,28 @@ def fetch_ocr(resource, ns, subdir):
         print(target_fname, file=error_log)
         print(trace, file=error_log)
         print(file=error_log)
+
+
+def attempt_download(resource, ns, target_path):
+    """ The unguarded, failable, reusable, core download operation.
+
+        Pass any didl:resource together with a namespace mapping and
+        a filesystem path to download to. Will attempt a download
+        once, check the MD5 hash if available and write to the
+        provided path. Throws an exception if any of the steps fail.
+        Returns the MD5 checksum and the URL on success.
+    """
+    checksum = resource.xpath('@dcx:md5_checksum', namespaces=ns)[0]
+    url = resource.get('ref')
+    response = requests.get(url, timeout=TIMEOUT)
+    response.raise_for_status()
+    if checksum:
+        hasher = md5()
+        hasher.update(response.content)
+        assert hasher.hexdigest() == checksum
+    with open(target_path, 'wb') as outfile:
+        outfile.write(response.content)
+    return checksum, url
 
 
 if __name__ == '__main__':
