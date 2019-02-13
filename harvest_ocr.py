@@ -110,7 +110,7 @@ def fetch_ocr(resource, ns, subdir):
 
 
 def attempt_download(resource, ns, target_path):
-    """ The unguarded, failable, reusable, core download operation.
+    """ Unguarded attempt to extract didl:resource information and download.
 
         Pass any didl:resource together with a namespace mapping and
         a filesystem path to download to. Will attempt a download
@@ -120,15 +120,20 @@ def attempt_download(resource, ns, target_path):
     """
     checksum = resource.xpath('@dcx:md5_checksum', namespaces=ns)[0]
     url = resource.get('ref')
+    download_core(target_path, checksum, url)
+    return checksum, url
+
+
+def download_core(path, checksum, url):
+    """ The unguarded, failable, reusable, core download operation. """
     response = requests.get(url, timeout=TIMEOUT)
     response.raise_for_status()
     if checksum:
         hasher = md5()
         hasher.update(response.content)
         assert hasher.hexdigest() == checksum
-    with open(target_path, 'wb') as outfile:
+    with open(path, 'wb') as outfile:
         outfile.write(response.content)
-    return checksum, url
 
 
 if __name__ == '__main__':
