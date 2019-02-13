@@ -9,13 +9,12 @@ import logging
 from lxml import etree
 from parse import compile as fcompile
 
-from common import PROGRESS_DIR, TARBALL_FORMAT
+from common import PROGRESS_DIR, TARBALL_FORMAT, METADATA_FORMAT
 
 ID_DIR_PATTERN = re.compile(r'^\d{2}$')
 DATE_XPATH = '//srw_dc:dcx/dc:date/text()'
 DATE_PATTERN = re.compile(r'(\d{4})-(\d{2}-\d{2})')
 LOG_BASENAME = 'group_by_year_errors.log'
-METADATA_FORMAT = 'DDD:ddd:{}:mpeg21.didl.xml.gz'
 
 tarball_parser = fcompile(TARBALL_FORMAT)
 
