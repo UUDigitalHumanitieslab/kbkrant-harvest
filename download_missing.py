@@ -51,18 +51,25 @@ def process_list(root, before, after):
     """
     while len(before):
         item = before.pop(0).split()  # pop from the front
+        print('item:', item)
         tried_before = (len(item) == 3)  # checksum and url already known
         fname = item[0]
         paper_id, article_serial = parse_article(fname)
+        print('paper_id:', paper_id)
         id_tail = paper_id[-2:]
         paper_dir = NEWSPAPER_FORMAT.format(paper_id)
+        print('paper_dir:', paper_dir)
         paper_symlink = op.join(root, id_tail, paper_dir)
+        print('paper_symlink:', paper_symlink)
         success = False
         if tried_before or op.exists(paper_symlink):
             success = process_item(paper_symlink, fname, item)
+        else:
+            print('Skipping because symlink does not exist yet.')
         if not success:
             after.append(' '.join(item) + '\n')
-        time.sleep(GRACE_TIME)  # give circumstances time to improve
+        # time.sleep(GRACE_TIME)  # give circumstances time to improve
+        input('Press enter to continue.')
 
 
 def process_item(paper_symlink, fname, item):
@@ -72,16 +79,22 @@ def process_item(paper_symlink, fname, item):
         Returns success: boolean.
     """
     paper_path = op.realpath(paper_symlink)
+    print('paper_path:', paper_path)
     article_path = op.join(paper_path, fname)
+    print('article_path:', article_path)
     try:
         if len(item) == 3:
+            input('Go straight to download_core?')
             _, checksum, url = item
             download_core(article_path, checksum, url)
         else:
             paper_id, article_serial = parse_article(fname)
             metadata = METADATA_FORMAT.format(paper_id)
+            print('metadata:', metadata)
             xml, ns = extract_gzipped_xml(op.join(paper_path, metadata))
             resource = xml.xpath(OCR_XPATH, namespaces=ns)[0]
+            print('resource:', resource)
+            input('Continue to attempt_download?')
             checksum, url = attempt_download(resource, ns, article_path)
             item += [checksum, url]
         return True
