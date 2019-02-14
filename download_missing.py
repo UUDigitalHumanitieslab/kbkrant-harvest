@@ -92,7 +92,8 @@ def process_item(paper_symlink, fname, item):
             metadata = METADATA_FORMAT.format(paper_id)
             print('metadata:', metadata)
             xml, ns = extract_gzipped_xml(op.join(paper_path, metadata))
-            resource = xml.xpath(OCR_XPATH, namespaces=ns)[0]
+            xpath = OCR_XPATH.format(fname)
+            resource = xml.xpath(xpath, namespaces=ns)[0]
             print('resource:')
             print(etree.tostring(resource, pretty_print=True))
             input('Continue to attempt_download?')
