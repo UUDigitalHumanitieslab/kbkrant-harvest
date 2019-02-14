@@ -93,6 +93,7 @@ def process_item(paper_symlink, fname, item):
             print('metadata:', metadata)
             xml, ns = extract_gzipped_xml(op.join(paper_path, metadata))
             xpath = OCR_XPATH.format(fname)
+            print('xpath:', xpath)
             resource = xml.xpath(xpath, namespaces=ns)[0]
             print('resource:')
             print(etree.tostring(resource, pretty_print=True))
