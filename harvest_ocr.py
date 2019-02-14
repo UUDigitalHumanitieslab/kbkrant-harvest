@@ -77,10 +77,7 @@ def process_manifest(manifest):
 
 def process_newspaper(subdir, newspaper):
     """ Harvest OCR from all articles in newspaper and return their paths. """
-    with gzip.open(op.join(subdir, newspaper), 'rb') as archive:
-        xml = etree.parse(archive)
-    ns = xml.getroot().nsmap.copy()
-    ns.pop(None, None) # duplicate of xmlns:didl (default namespace)
+    xml, ns = extract_gzipped_xml(op.join(subdir, newspaper))
     resources = xml.xpath(OCR_XPATH, namespaces=ns)
     harvest = []
     for node in resources:
@@ -88,6 +85,15 @@ def process_newspaper(subdir, newspaper):
         if result is not None:
             harvest.append(result)
     return harvest
+
+
+def extract_gzipped_xml(path):
+    """ Extract the etree and namespace mapping from xml.gz `path`. """
+    with gzip.open(path, 'rb') as archive:
+        xml = etree.parse(archive)
+    ns = xml.getroot().nsmap.copy()
+    ns.pop(None, None) # duplicate of xmlns:didl (default namespace)
+    return xml, ns
 
 
 def fetch_ocr(resource, ns, subdir):
