@@ -52,7 +52,7 @@ def process_list(root, before, after):
         print('item:', item)
         tried_before = (len(item) == 3)  # checksum and url already known
         fname = item[0]
-        paper_id, article_serial = parse_article(fname)
+        paper_id, article_serial = parse_article.parse(fname)
         print('paper_id:', paper_id)
         id_tail = paper_id[-2:]
         paper_dir = NEWSPAPER_FORMAT.format(paper_id)
@@ -86,7 +86,7 @@ def process_item(paper_symlink, fname, item):
             _, checksum, url = item
             download_core(article_path, checksum, url)
         else:
-            paper_id, article_serial = parse_article(fname)
+            paper_id, article_serial = parse_article.parse(fname)
             metadata = METADATA_FORMAT.format(paper_id)
             print('metadata:', metadata)
             xml, ns = extract_gzipped_xml(op.join(paper_path, metadata))
