@@ -2,7 +2,9 @@ import os
 import os.path as op
 import sys
 import time
+import traceback
 
+from lxml import etree
 from parse import compile as fcompile
 
 from harvest_ocr import attempt_download, download_core, extract_gzipped_xml
@@ -91,12 +93,14 @@ def process_item(paper_symlink, fname, item):
             print('metadata:', metadata)
             xml, ns = extract_gzipped_xml(op.join(paper_path, metadata))
             resource = xml.xpath(OCR_XPATH, namespaces=ns)[0]
-            print('resource:', resource)
+            print('resource:')
+            print(etree.tostring(resource, pretty_print=True))
             input('Continue to attempt_download?')
             checksum, url = attempt_download(resource, ns, article_path)
             item += [checksum, url]
         return True
     except:
+        print(traceback.format_exc())
         return False
 
 
