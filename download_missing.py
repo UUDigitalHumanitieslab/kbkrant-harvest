@@ -2,9 +2,7 @@ import os
 import os.path as op
 import sys
 import time
-import gzip
 
-from lxml import etree
 from parse import compile as fcompile
 
 from harvest_ocr import attempt_download, download_core, extract_gzipped_xml
@@ -100,3 +98,7 @@ def process_item(paper_symlink, fname, item):
         return True
     except:
         return False
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))
