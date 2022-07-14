@@ -1,5 +1,7 @@
--e git+https://github.com/UUDigitalHumanitieslab/oai-harvest.git@feature/incremental#egg=oaiharvest
--e git+https://github.com/UUDigitalHumanitieslab/pyoai.git#egg=pyoai
+# -e git+https://github.com/UUDigitalHumanitieslab/oai-harvest.git@feature/incremental#egg=oaiharvest
+# -e git+https://github.com/UUDigitalHumanitieslab/pyoai.git#egg=pyoai
+pyoai
+oaiharvest
 lxml
 requests
 parse
