@@ -6,6 +6,7 @@ import traceback
 import gzip
 import tarfile
 from hashlib import sha512, md5
+import re
 
 from lxml import etree
 import requests
@@ -63,7 +64,10 @@ def process_manifest(manifest):
     for path in lines:
         subdir, newspaper = op.split(path)
         harvested = process_newspaper(subdir, newspaper)
-        serial = newspaper.split(':')[3]
+        try:
+            serial = newspaper.split(':')[3]
+        except:
+            serial = newspaper.split('_')[1].strip('.tgz')
         tarball_path = op.join(subdir, TARBALL_FORMAT.format(serial))
         with tarfile.open(tarball_path, 'w:gz') as tarball:
             tarball.add(path, arcname=newspaper)
@@ -91,7 +95,6 @@ def extract_gzipped_xml(path):
     """ Extract the etree and namespace mapping from xml.gz `path`. """
     if path.endswith('.tgz'):
         with tarfile.open(path, 'r:gz') as tarball:
-            print(tarball.getmembers()[0])
             path = tarball.getmembers()[0]
             gzfile = tarball.extractfile(path.name)
             with gzip.open(gzfile, 'rb') as archive:
