@@ -5,7 +5,7 @@ import time
 import traceback
 import gzip
 import tarfile
-from hashlib import md5
+from hashlib import sha512, md5
 
 from lxml import etree
 import requests
@@ -63,7 +63,7 @@ def process_manifest(manifest):
     for path in lines:
         subdir, newspaper = op.split(path)
         harvested = process_newspaper(subdir, newspaper)
-        serial = newspaper.split(':')[2]
+        serial = newspaper.split(':')[3]
         tarball_path = op.join(subdir, TARBALL_FORMAT.format(serial))
         with tarfile.open(tarball_path, 'w:gz') as tarball:
             tarball.add(path, arcname=newspaper)
@@ -89,8 +89,16 @@ def process_newspaper(subdir, newspaper):
 
 def extract_gzipped_xml(path):
     """ Extract the etree and namespace mapping from xml.gz `path`. """
-    with gzip.open(path, 'rb') as archive:
-        xml = etree.parse(archive)
+    if path.endswith('.tgz'):
+        with tarfile.open(path, 'r:gz') as tarball:
+            print(tarball.getmembers()[0])
+            path = tarball.getmembers()[0]
+            gzfile = tarball.extractfile(path.name)
+            with gzip.open(gzfile, 'rb') as archive:
+                xml = etree.parse(archive)
+    else:
+        with gzip.open(path, 'rb') as archive:
+            xml = etree.parse(archive)
     ns = xml.getroot().nsmap.copy()
     ns.pop(None, None) # duplicate of xmlns:didl (default namespace)
     return xml, ns
@@ -105,7 +113,9 @@ def fetch_ocr(resource, ns, subdir):
         try:
             target_fname = resource.xpath('@dcx:filename', namespaces=ns)[0]
             target_path = op.join(subdir, target_fname)
-            attempt_download(resource, ns, target_path)
+            target_hashname = 'md5' if len(resource.xpath("@dcx:md5_checksum", namespaces=ns)) is not 0 else 'sha512'
+            print(target_hashname)
+            attempt_download(resource, ns, target_path, target_hashname)
             return target_path, target_fname
         except:
             trace = traceback.format_exc()
@@ -115,7 +125,7 @@ def fetch_ocr(resource, ns, subdir):
         print(file=error_log)
 
 
-def attempt_download(resource, ns, target_path):
+def attempt_download(resource, ns, target_path, hashname):
     """ Unguarded attempt to extract didl:resource information and download.
 
         Pass any didl:resource together with a namespace mapping and
@@ -124,20 +134,25 @@ def attempt_download(resource, ns, target_path):
         provided path. Throws an exception if any of the steps fail.
         Returns the MD5 checksum and the URL on success.
     """
-    checksum = resource.xpath('@dcx:md5_checksum', namespaces=ns)[0]
+    checksum = resource.xpath('@dcx:{}_checksum'.format(hashname), namespaces=ns)[0]
     url = resource.get('ref')
-    download_core(target_path, checksum, url)
+    download_core(target_path, checksum, url, hashname)
     return checksum, url
 
 
-def download_core(path, checksum, url):
+def download_core(path, checksum, url, hashname):
     """ The unguarded, failable, reusable, core download operation. """
     response = requests.get(url, timeout=TIMEOUT)
     response.raise_for_status()
-    if checksum:
+    if checksum and hashname == 'sha512':
+        hasher = sha512()
+        hasher.update(response.content)
+        assert hasher.hexdigest() == checksum
+    elif checksum and hashname == 'md5':
         hasher = md5()
         hasher.update(response.content)
         assert hasher.hexdigest() == checksum
+
     with open(path, 'wb') as outfile:
         outfile.write(response.content)
 
