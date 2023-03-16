@@ -57,7 +57,7 @@ def get_manifest(root):
 def get_derived_paths(source):
     """ Compute common paths and path components for an input file. """
     root, name = op.split(source)
-    serial = name.split(':')[2]
+    serial = name.split(':')[3]
     subdir = op.join(root, serial[-2:])
     destination = op.join(subdir, name + '.gz')
     return root, name, serial, subdir, destination
