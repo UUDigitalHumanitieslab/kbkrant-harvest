@@ -113,8 +113,7 @@ def fetch_ocr(resource, ns, subdir):
         try:
             target_fname = resource.xpath('@dcx:filename', namespaces=ns)[0]
             target_path = op.join(subdir, target_fname)
-            target_hashname = 'md5' if len(resource.xpath("@dcx:md5_checksum", namespaces=ns)) is not 0 else 'sha512'
-            print(target_hashname)
+            target_hashname = 'md5' if len(resource.xpath("@dcx:md5_checksum", namespaces=ns)) != 0 else 'sha512'
             attempt_download(resource, ns, target_path, target_hashname)
             return target_path, target_fname
         except:
