@@ -67,7 +67,7 @@ def process_manifest(manifest):
         try:
             serial = newspaper.split(':')[3]
         except:
-            serial = newspaper.split('_')[1].strip('.tgz')
+            serial = newspaper.split('_')[2].strip('.tgz')
         tarball_path = op.join(subdir, TARBALL_FORMAT.format(serial))
         with tarfile.open(tarball_path, 'w:gz') as tarball:
             tarball.add(path, arcname=newspaper)
