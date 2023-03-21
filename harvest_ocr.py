@@ -15,7 +15,7 @@ from common import MANIFEST_DIR, TARBALL_FORMAT, PROGRESS_DIR
 
 FINISHED_DIR = 'ocr_complete'
 OCR_XPATH = "//didl:Resource[../didl:Descriptor/didl:Statement/text()='ocr']"
-ERROR_LOG = 'failures.log'
+ERROR_LOG = 'new_failures.log'
 TIMEOUT = 1 # second
 RETRY_INTERVAL = 0.25 # second
 MAX_RETRIES = 5
